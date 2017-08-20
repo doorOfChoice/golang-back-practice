@@ -1,0 +1,16 @@
+<div class="col-xs-2 bg-dark vertical-block">
+    <ul class="nav nav-pills nav-stacked navback vertical-block">
+        {{if .navnum}}
+        <li {{if eq .navnum 1}}class="active" {{end}}><a href="{{urlfor `IndexController.Index`}}">首页</a></li>
+        <li {{if eq .navnum 2}}class="active" {{end}}><a href="{{urlfor `PostController.ManaPage`}}">管理文章</a></li>
+        <li {{if eq .navnum 3}}class="active" {{end}}><a href="{{urlfor `TagController.ManaPage`}}">管理标签</a></li>
+        <li {{if eq .navnum 4}}class="active" {{end}}><a href="{{urlfor `UserController.ManaPage`}}">管理用户</a></li>
+        {{else}}
+        <li><a href="{{urlfor `IndexController.Index`}}">首页</a></li>
+        <li><a href="{{urlfor `PostController.ManaPage`}}">管理文章</a></li>
+        <li><a href="{{urlfor `TagController.ManaPage`}}">管理标签</a></li>
+        <li><a href="{{urlfor `UserController.ManaPage`}}">管理用户</a></li>
+        {{end}}
+        <li><a href="/account/login">注销</a></li>
+    </ul>
+</div>

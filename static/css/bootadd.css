@@ -1,0 +1,8 @@
+html,body{height: 100%;}
+form{display: inline}
+.bg-dark {background-color: #363636;}
+.vertical-block{height: 100%;overflow-y: auto;}
+.navback>li>a{color:white;font-size: 15px;}
+.navback>li>a:hover,.navback>li>a:focus{background-color: #4F4F4F;}
+.content-back{padding: 3em;height: 100%;overflow-y: scroll;}
+.btn-group{padding: 5px}
