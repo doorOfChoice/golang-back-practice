@@ -28,9 +28,10 @@ type User struct {
 	Id             int `orm:"auto;pk"`
 	Username       string
 	Password       string
-	Token          string  `orm:"unique"`
-	Identification int     `orm:"null;default(0)"`
-	Posts          []*Post `orm:"reverse(many)"`
+	Token          string   `orm:"unique"`
+	Identification int      `orm:"null;default(0)"`
+	Profile        *Profile `orm:"rel(one)"`
+	Posts          []*Post  `orm:"reverse(many)"`
 }
 
 func (this *User) Create() error {
@@ -40,7 +41,11 @@ func (this *User) Create() error {
 	if n, _ := o.QueryTable(&User{}).Count(); n == 0 {
 		this.Identification = POWER_SUPER_ADMIN
 	}
+	//设置默认头像
+	profile := &Profile{Head: "/static/img/default/header-custom.svg"}
+	o.Insert(profile)
 
+	this.Profile = profile
 	b, _, err := o.ReadOrCreate(this, "Username")
 	if err == nil {
 		if !b {
@@ -72,6 +77,16 @@ func GetUsersByPagination(r *http.Request, linkCount, per int64) (*pagination.Pa
 	o := orm.NewOrm()
 	var users []*User
 	seter := o.QueryTable(&User{})
+
+	qType, qValue := r.URL.Query().Get("type"), r.URL.Query().Get("value")
+
+	switch qType {
+	case "id":
+		seter = seter.Filter("id", qValue).OrderBy("-id")
+	case "username":
+		seter = seter.Filter("username", qValue).OrderBy("-id")
+	}
+
 	paginator := pagination.NewPaginator(r, seter, &users, linkCount, per)
 
 	return paginator, users
@@ -87,7 +102,7 @@ func GetUser(id int) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	o.LoadRelated(user, "Profile")
 	return user, nil
 }
 
@@ -107,7 +122,7 @@ func FindUserByToken(token string) *User {
 	o := orm.NewOrm()
 	var user User
 
-	err := o.QueryTable(&User{}).Filter("token", token).One(&user)
+	err := o.QueryTable(&User{}).Filter("token", token).RelatedSel().One(&user)
 	if err != nil {
 		return nil
 	}

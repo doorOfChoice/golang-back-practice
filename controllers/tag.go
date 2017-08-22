@@ -3,6 +3,7 @@ package controllers
 import (
 	"blog/models"
 	"blog/tools"
+	"log"
 	"strconv"
 
 	"github.com/astaxie/beego"
@@ -20,7 +21,8 @@ func (c *TagController) Create() {
 	}()
 
 	name := c.GetString("name")
-	if !tools.FilterString(`^[\p{Han}|\w]{1, 40}$`, name) {
+	log.Println(name)
+	if !tools.FilterString(`^[\p{Han}|\w]{1,40}$`, name) {
 		flash.Error("标签名不合法")
 	} else {
 		tag := &models.Tag{Name: name}

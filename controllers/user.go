@@ -18,7 +18,7 @@ func convertPower(powerStr string) int {
 	if err != nil {
 		return models.POWER_USER
 	}
-	if power < models.POWER_ADMIN || power > models.POWER_USER {
+	if power < models.POWER_SUPER_ADMIN || power > models.POWER_USER {
 		return models.POWER_USER
 	}
 	return power
@@ -28,8 +28,11 @@ func convertPower(powerStr string) int {
 func (c *UserController) Create() {
 	flash := beego.NewFlash()
 	crash := true
-
-	username, password, power := c.GetString("username"), c.GetString("password"), c.GetString("power")
+	var (
+		username = c.GetString("username")
+		password = c.GetString("password")
+		power    = c.GetString("power")
+	)
 
 	defer func() {
 		flash.Data["Username"] = username
@@ -82,7 +85,7 @@ func (c *UserController) Get() {
 			crash = false
 			c.Data["navnum"] = NAVMANAUSERS
 			c.Data["User"] = user
-			c.Data["Powers"] = Powers
+			c.Data["IsSelf"] = user.Id == c.user.Id
 			c.TplName = "admin/update_user.tpl"
 		}
 	}
@@ -135,7 +138,7 @@ func (c *UserController) Update() {
 			flash.Error("用户不存在")
 		} else {
 			//检测本人是否有修改权限
-			if c.user.Identification >= user.Identification {
+			if c.user.Id != user.Id && c.user.Identification >= user.Identification {
 				flash.Error("对不起，你没有权限更改此用户信息")
 				return
 			}
@@ -145,10 +148,13 @@ func (c *UserController) Update() {
 			}
 
 			//检测是否能够修改用户的权限
-			user.Identification = convertPower(power)
-			if c.user.Identification >= user.Identification {
-				flash.Error("你只能设置他的权限比你低")
-				return
+			//如果是本人则忽略这一条
+			if c.user.Id != user.Id {
+				user.Identification = convertPower(power)
+				if c.user.Identification >= user.Identification {
+					flash.Error("你只能设置他的权限比你低")
+					return
+				}
 			}
 
 			if err := user.Update(); err != nil {
@@ -157,6 +163,14 @@ func (c *UserController) Update() {
 				flash.Success("更新成功")
 			}
 		}
+	}
+}
+
+func (c *UserController) LoginOut() {
+	if c.isLogin {
+		c.DelSession("d_user")
+		c.Ctx.SetSecureCookie("sha256", "d_user", "null", 0)
+		c.Redirect("/account/login", 302)
 	}
 }
 

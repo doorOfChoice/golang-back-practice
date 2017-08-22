@@ -3,6 +3,7 @@ package main
 import (
 	"blog/models"
 	_ "blog/routers"
+	"fmt"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
@@ -10,45 +11,34 @@ import (
 )
 
 func init() {
-	orm.RegisterDriver("mysql", orm.DRMySQL)
-	orm.RegisterDataBase("default", "mysql", "root:1997@/dawnblog?charset=utf8")
+	var (
+		duser     = beego.AppConfig.String("duser")
+		dpassword = beego.AppConfig.String("dpassword")
+		database  = beego.AppConfig.String("database")
+	)
+	orm.RegisterDataBase("default", "mysql", fmt.Sprintf("%s:%s@/%s?charset=utf8", duser, dpassword, database))
+
 	orm.RegisterModel(
 		new(models.User),
 		new(models.Post),
 		new(models.Tag),
+		new(models.Profile),
 	)
-	beego.SetStaticPath("/static/js", "static/js")
-	beego.SetStaticPath("/static/css", "static/css")
-	beego.SetStaticPath("/static/image", "static/img")
-	beego.SetStaticPath("/static/vedio", "static/vedio")
-
 	orm.Debug = true
 
-	beego.AddFuncMap("add", func(a, b int) int {
-		return a + b
-	})
+	beego.AddFuncMap("add", add)
+	beego.AddFuncMap("whatpower", mapPower)
+	beego.AddFuncMap("stations", getStations)
 
-	beego.AddFuncMap("whatpower", func(power int) string {
-		switch power {
-		case models.POWER_ADMIN:
-			return "管理员"
-		case models.POWER_USER:
-			return "普通用户"
-		case models.POWER_SUPER_ADMIN:
-			return "超级管理员"
-		default:
-			return "Unkonw"
+	rebuild, err := beego.AppConfig.Bool("rebuilddatabase")
+	if err == nil {
+		if rebuild {
+			orm.RunSyncdb("default", true, true)
 		}
-	})
-	//orm.RunSyncdb("default", true, true)
+	}
+
 }
 
 func main() {
 	beego.Run()
-	// o := orm.NewOrm()
-	// var ps []*models.Post
-	// o.QueryTable(&models.Post{}).Filter("title__icontains", "ew").OrderBy("-id").All(&ps)
-	// for _, v := range ps {
-	// 	log.Println(v.Title)
-	// }
 }

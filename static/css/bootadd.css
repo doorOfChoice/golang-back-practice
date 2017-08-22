@@ -1,8 +1,28 @@
 html,body{height: 100%;}
 form{display: inline}
-.bg-dark {background-color: #363636;}
+p{word-break: break-all;}
+.bg-dark {background-color: #696969;}
 .vertical-block{height: 100%;overflow-y: auto;}
 .navback>li>a{color:white;font-size: 15px;}
 .navback>li>a:hover,.navback>li>a:focus{background-color: #4F4F4F;}
+.nav-pills>li.active>a {background-color: #363636}
 .content-back{padding: 3em;height: 100%;overflow-y: scroll;}
 .btn-group{padding: 5px}
+.search-group{padding:5px; text-align: right;}
+.tag-close {background-color: #a22826;color: white;cursor: default;}
+.tag-interval{margin-right:3px;}
+img.img-header{width:128px;height:128px;display: block;background-size: cover;border-radius: 50%;}
+.float-left {float: left}
+.float-right{float: right}
+.post-title{
+    display: block;
+    min-width: 200px;
+    width: 40%;
+    margin-bottom: 5px;
+}
+.post-tags{
+     display: block;
+    min-width: 200px;
+    width: 40%;
+    margin-bottom: 5px;
+}

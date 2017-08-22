@@ -64,7 +64,6 @@ func UniqStringArray(strings []string) []string {
 			uniqMap[v] = true
 		}
 	}
-
 	return uniqArray
 }
 
@@ -82,4 +81,10 @@ func FilterString(reg string, strs ...string) bool {
 	}
 
 	return true
+}
+
+func FindParams(reg, str string) [][]string {
+	r, _ := regexp.Compile(reg)
+
+	return r.FindAllStringSubmatch(str, -1)
 }

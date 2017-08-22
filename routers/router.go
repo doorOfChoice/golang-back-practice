@@ -34,9 +34,11 @@ func init() {
 		beego.NSRouter(`/tag/:id(\d+)`, &controllers.TagController{}, "DELETE:Delete"),
 		beego.NSRouter("/manaTags", &controllers.TagController{}, "GET:ManaPage"),
 
-		beego.NSRouter("/user", &controllers.UserController{}, "POST:Create;GET:CreatePage"),
+		beego.NSRouter("/user", &controllers.UserController{}, "POST:Create;GET:CreatePage;DELETE:LoginOut"),
 		beego.NSRouter(`/user/:id(\d+)`, &controllers.UserController{}, "DELETE:Delete;Put:Update;GET:Get"),
 		beego.NSRouter("/manaUsers", &controllers.UserController{}, "GET:ManaPage"),
+
+		beego.NSRouter(`/profile/:id(\d+)`, &controllers.ProfileController{}, "PUT:Update"),
 	)
 
 	beego.AddNamespace(ns)

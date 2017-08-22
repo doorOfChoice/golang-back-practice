@@ -3,6 +3,15 @@
 
 <head>
     {{template "admin/layout/head.html" .}}
+    <script>
+        $(function(){
+            $("#btn-query").click(function(e){
+                var type = $('input[name="query-type"]:checked').val()
+                var value = $("[name='query-value']").val()
+                location.href = "/admin/manaPosts?type=" + type + "&value="+value
+            })
+        })
+    </script>
 </head>
 
 <body>
@@ -11,17 +20,36 @@
             {{template "admin/layout/navigator.html" .}}
 
             <div class="col-xs-10 content-back">
-                <div class="btn-group" >
-                    <form action="/admin/post" method="GET">
-                        <input type="submit" class="btn btn-primary" value="＋新建文章">
-                    </form>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="btn-group">
+                            <form action="/admin/post" method="GET">
+                                <input type="submit" class="btn btn-primary" value="＋新建文章">
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-inline search-group" >
+                            <div class="form-group">
+                                <input type="email" name="query-value" class="form-control">
+                                <button class="btn btn-default" id="btn-query">查询</button>
+                                <label><input type="radio" name="query-type" value="all" checked>全部</label>
+                                <label><input type="radio" name="query-type" value="id">id</label>
+                                <label><input type="radio" name="query-type" value="tag">标签</label>
+                                <label><input type="radio" name="query-type" value="title">标题</label>
+                                <label><input type="radio" name="query-type" value="user">用户</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-danger">{{.flash.error}}</p>
-                <p class="text-success">{{.flash.success}}</p>
+                {{if .flash.error}}<div class="alert alert-danger" role="alert">{{.flash.error}}</div>{{end}}
+                {{if .flash.success}}<div class="alert alert-success" role="alert">{{.flash.success}}</div>{{end}}
+                
                 <table class="table table-hover">
                     <tr>
                         <th>id</th>
                         <th>标题</th>
+                        <th>创建人</th>
                         <th>创建日期</th>
                         <th>修改日期</th>
                         <th>行为</th>
@@ -30,6 +58,7 @@
                     <tr>
                         <td>{{.Id}}</td>
                         <td>{{.Title}}</td>
+                        <td>{{.User.Username}}</td>
                         <td>{{date .CreateDate "Y-m-d H:i:s"}}</td>
                         <td>{{date .UpdateDate "Y-m-d H:i:s"}}</td>
                         <td>
@@ -44,6 +73,10 @@
                     </tr>
                     {{end}} {{end}}
                 </table>
+                {{$len := len .Posts}}
+                {{if eq $len 0}}
+                    <center><h3>😄空空如也...</h3></center>
+                {{end}}
                 <div>
                     <span>页码 {{.P.CurrentPage}}/{{.P.MaxPage}},</span>
                     <span>显示 {{.P.CurrentValue}}/{{.P.PerValue}}, 总共检索到{{.P.MaxValue}}条数据</span>

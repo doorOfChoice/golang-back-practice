@@ -3,6 +3,15 @@
 
 <head>
     {{template "admin/layout/head.html" .}}
+     <script>
+        $(function(){
+            $("#btn-query").click(function(e){
+                var type = $('input[name="query-type"]:checked').val()
+                var value = $("[name='query-value']").val()
+                location.href = "/admin/manaUsers?type=" + type + "&value="+value
+            })
+        })
+    </script>
 </head>
 
 <body>
@@ -11,13 +20,28 @@
             {{template "admin/layout/navigator.html" .}}
 
             <div class="col-xs-10 content-back">
-                <div class="btn-group" >
-                    <form action="/admin/user" method="GET">
-                        <input type="submit" class="btn btn-primary" value="＋新建用户">
-                    </form>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="btn-group">
+                            <form action="/admin/user" method="GET">
+                                <input type="submit" class="btn btn-primary" value="＋新建用户">
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="form-inline search-group">
+                            <div class="form-group">
+                                <input type="email" name="query-value" class="form-control">
+                                <button class="btn btn-default" id="btn-query">查询</button>
+                                <label><input type="radio" name="query-type" value="all" checked>全部</label>
+                                <label><input type="radio" name="query-type" value="id">id</label>
+                                <label><input type="radio" name="query-type" value="username">用户名</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-danger">{{.flash.error}}</p>
-                <p class="text-success">{{.flash.success}}</p>
+                {{if .flash.error}}<div class="alert alert-danger" role="alert">{{.flash.error}}</div>{{end}}
+                {{if .flash.success}}<div class="alert alert-success" role="alert">{{.flash.success}}</div>{{end}}
                 <table class="table table-hover">
                     <tr>
                         <th>id</th>

@@ -13,21 +13,16 @@ type PostController struct {
 	AdminController
 }
 
+// Get 获取单个文章页面
 func (c *PostController) Get() {
-	flash := beego.NewFlash()
-
+	beego.ReadFromRequest(&c.Controller)
 	idStr := c.Ctx.Input.Param(":id")
 
 	if id, err := strconv.Atoi(idStr); err != nil {
-		flash.Error("错误的查询参数")
-		flash.Store(&c.Controller)
 		c.Redirect("/admin/error/panic", 302)
 	} else if post, err := models.GetPost(id); err != nil {
-		flash.Error(err.Error())
-		flash.Store(&c.Controller)
 		c.Redirect("/admin/error/panic", 302)
 	} else {
-		beego.ReadFromRequest(&c.Controller)
 		c.Data["Post"] = post
 		c.Data["navnum"] = NAVMANAPOSTS
 		c.TplName = "admin/update_post.tpl"
@@ -94,11 +89,12 @@ func (c *PostController) Update() {
 		c.Ctx.Input.Bind(&deletedIds, "deleted-ids")
 
 		title, newTags, content := c.GetString("title"), c.GetString("new-tags"), c.GetString("content")
+
 		if !tools.FilterString(`^.{1,40}$`, title) {
 			flash.Error("标题请限制在1-40个字符间")
 		} else {
-			ok := tools.FilterString(`^[\p{Han}|\w]+(,[\p{Han}|\w]+)*$`, newTags)
-			blank := tools.FilterString(`^\s*$`, newTags)
+			ok := tools.FilterString(`^[\p{Han}|\w]+?(,[\p{Han}|\w]+?)*$`, newTags)
+			blank := strings.TrimSpace(newTags) == ""
 			if (!ok && blank) || ok {
 				post.Title = title
 				post.Content = content

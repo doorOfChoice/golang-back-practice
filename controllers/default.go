@@ -14,7 +14,7 @@ const (
 	NAVMANAUSERS
 )
 
-var Powers = []int{models.POWER_USER, models.POWER_ADMIN}
+var Powers = []int{models.POWER_SUPER_ADMIN, models.POWER_ADMIN, models.POWER_USER}
 
 type AdminController struct {
 	user    *models.User
@@ -35,5 +35,7 @@ func (c *AdminController) Prepare() {
 		}
 		c.isLogin = true
 		c.user = models.FindUserByToken(str)
+		c.Data["LoginUser"] = c.user
+		c.Data["Powers"] = Powers
 	}
 }
